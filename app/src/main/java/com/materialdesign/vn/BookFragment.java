@@ -1,18 +1,22 @@
 package com.materialdesign.vn;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.materialdesign.vn.dummy.DummyContent;
 import com.materialdesign.vn.dummy.DummyContent.DummyItem;
+
+import java.io.Serializable;
 
 
 public class BookFragment extends Fragment implements MyBookRecyclerViewAdapter.OnListFragmentInteractionListener {
@@ -60,8 +64,17 @@ public class BookFragment extends Fragment implements MyBookRecyclerViewAdapter.
         return view;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void onListFragmentInteraction(DummyItem item) {
-        Log.e("TAG", "click");
+    public void onListFragmentInteraction(DummyItem item, MyBookRecyclerViewAdapter.ViewHolder holder) {
+        Intent intent = new Intent(getContext(), BookDetailActivity.class);
+        intent.putExtra("DummyItem", item);
+        View image = holder.image;
+        View contentView = holder.mContentView;
+        Pair<View, String> pair1 = Pair.create(image, holder.image.getTransitionName());
+        Pair<View, String> pair2 = Pair.create(contentView, holder.mContentView.getTransitionName());
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(getActivity(), pair1, pair2);
+        startActivity(intent, options.toBundle());
     }
 }

@@ -85,7 +85,7 @@ public class HomeActivity extends AppCompatActivity
             transaction.commit();
             setFloatingActionButtonForBookTab();
         } else if (id == R.id.nav_gallery) {
-
+            setFloatingActionButtonForHomeTab();
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -103,6 +103,7 @@ public class HomeActivity extends AppCompatActivity
 
     private void setFloatingActionButtonForBookTab() {
         fab.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.colorAccent));
+        fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_action_add));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,8 +112,10 @@ public class HomeActivity extends AppCompatActivity
             }
         });
     }
+
     private void setFloatingActionButtonForHomeTab() {
         fab.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.colorPrimary));
+        fab.setImageDrawable(ContextCompat.getDrawable(this, android.R.drawable.ic_menu_add));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

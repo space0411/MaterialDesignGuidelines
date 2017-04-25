@@ -6,4 +6,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="item_image_transition_name">item_image</string>
+    <string name="title_activity_book_detail">BookDetailActivity</string>
+    <string name="item_content_transition_name">item_content</string>
 </resources>
