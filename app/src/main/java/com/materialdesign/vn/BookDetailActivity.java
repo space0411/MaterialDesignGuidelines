@@ -33,13 +33,13 @@ public class BookDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final ImageView imageBanner = (ImageView) findViewById(R.id.image_banner);
         imageBanner.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.new_material_design_wallpaper_chrome));
-        imageBanner.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        /*imageBanner.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
                 view.removeOnLayoutChangeListener(this);
                 createCircularReveal(imageBanner, 700);
             }
-        });
+        });*/
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -52,7 +52,10 @@ public class BookDetailActivity extends AppCompatActivity {
             collapsingToolbarLayout.setTitle(data.content);
             image.setImageDrawable(ContextCompat.getDrawable(this, data.idDrawable));
             detail.setText(data.details);
-            //scaleView(detail);
+            Animation bottomUp = AnimationUtils.loadAnimation(this,
+                    R.anim.bottom_up);
+            detail.startAnimation(bottomUp);
+            detail.setVisibility(View.VISIBLE);
         }
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -60,7 +63,7 @@ public class BookDetailActivity extends AppCompatActivity {
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
                 view.removeOnLayoutChangeListener(this);
-                createCircularReveal(fab, 1000);
+                createCircularReveal(fab, 500);
             }
         });
 
@@ -71,14 +74,14 @@ public class BookDetailActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide(Gravity.BOTTOM);
             slide.addTarget(R.id.description);
             slide.setInterpolator(AnimationUtils.loadInterpolator(this, android.R.interpolator
                     .linear_out_slow_in));
-            slide.setDuration(slideDuration);
+            slide.setDuration(500);
             getWindow().setEnterTransition(slide);
-        }
+        }*/
     }
 
     private void createCircularReveal(View myView, int duration) {

@@ -1,6 +1,8 @@
 package com.materialdesign.vn;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private FloatingActionButton fab;
+    private BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +31,13 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        setFloatingActionButtonForHomeTab();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+            }
+        });
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -37,6 +46,8 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        initBottomSheet();
     }
 
     @Override
@@ -45,7 +56,12 @@ public class HomeActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+                bottomSheetBehavior.setPeekHeight(200);
+                fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
+                super.onBackPressed();
+            } else
+                super.onBackPressed();
         }
     }
 
@@ -83,9 +99,10 @@ public class HomeActivity extends AppCompatActivity
             transaction.addToBackStack(null);
             transaction.replace(R.id.content_main, new BookFragment(), null);
             transaction.commit();
-            setFloatingActionButtonForBookTab();
+            bottomSheetBehavior.setPeekHeight(0);
+            fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
         } else if (id == R.id.nav_gallery) {
-            setFloatingActionButtonForHomeTab();
+
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -101,7 +118,7 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    private void setFloatingActionButtonForBookTab() {
+   /* private void setFloatingActionButtonForBookTab() {
         fab.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.colorAccent));
         fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_action_add));
         fab.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +138,31 @@ public class HomeActivity extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+            }
+        });
+    }*/
+
+    private void initBottomSheet() {
+        View llBottomSheet = findViewById(R.id.bottom_sheet);
+        // init the bottom sheet behavior
+        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        bottomSheetBehavior.setPeekHeight(200);
+        // set callback for changes
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+                // this part hides the button immediately and waits bottom sheet
+                // to collapse to show
+                if (BottomSheetBehavior.STATE_DRAGGING == newState) {
+                    fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+                } else if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
+                    fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
     }
