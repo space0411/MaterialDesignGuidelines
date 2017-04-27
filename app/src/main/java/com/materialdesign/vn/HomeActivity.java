@@ -1,5 +1,10 @@
 package com.materialdesign.vn;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -8,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +23,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewAnimationUtils;
+import android.view.Window;
+import android.widget.ImageView;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,8 +43,9 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+                //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                //fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+                showDiag();
             }
         });
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -58,6 +68,7 @@ public class HomeActivity extends AppCompatActivity
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 bottomSheetBehavior.setPeekHeight(200);
+                fab.setVisibility(View.VISIBLE);
                 fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 super.onBackPressed();
             } else
@@ -92,17 +103,22 @@ public class HomeActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (id == R.id.nav_share_element) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.addToBackStack(null);
             transaction.replace(R.id.content_main, new BookFragment(), null);
             transaction.commit();
             bottomSheetBehavior.setPeekHeight(0);
             fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+            fab.setVisibility(View.INVISIBLE);
         } else if (id == R.id.nav_gallery) {
-
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.content_main, new BottomNavigationFragment(), null);
+            transaction.commit();
+            bottomSheetBehavior.setPeekHeight(0);
+            fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+            fab.setVisibility(View.INVISIBLE);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -165,5 +181,89 @@ public class HomeActivity extends AppCompatActivity
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
+    }
+
+    private void showDiag() {
+
+        final View dialogView = View.inflate(this, R.layout.dialog, null);
+
+        final Dialog dialog = new Dialog(this, R.style.MyAlertDialogStyle);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(dialogView);
+
+        ImageView imageView = (ImageView) dialog.findViewById(R.id.closeDialogImg);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                revealShow(dialogView, false, dialog);
+            }
+        });
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                revealShow(dialogView, true, null);
+            }
+        });
+
+        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                if (i == KeyEvent.KEYCODE_BACK) {
+
+                    revealShow(dialogView, false, dialog);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        dialog.show();
+    }
+
+    private void revealShow(View dialogView, boolean b, final Dialog dialog) {
+
+        final View view = dialogView.findViewById(R.id.dialog);
+
+        int w = view.getWidth();
+        int h = view.getHeight();
+
+        int endRadius = (int) Math.hypot(w, h);
+
+        int cx = (int) (fab.getX() + (fab.getWidth()/2));
+        int cy = (int) (fab.getY())+ fab.getHeight() + 56;
+
+
+        if(b){
+            Animator revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx,cy, 0, endRadius);
+
+            view.setVisibility(View.VISIBLE);
+            revealAnimator.setDuration(500);
+            revealAnimator.start();
+
+        } else {
+
+            Animator anim =
+                    ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    dialog.dismiss();
+                    view.setVisibility(View.INVISIBLE);
+
+                }
+            });
+            anim.setDuration(500);
+            anim.start();
+        }
+
     }
 }

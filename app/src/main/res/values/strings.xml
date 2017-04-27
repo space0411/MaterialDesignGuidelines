@@ -9,4 +9,7 @@
     <string name="item_image_transition_name">item_image</string>
     <string name="title_activity_book_detail">BookDetailActivity</string>
     <string name="item_content_transition_name">item_content</string>
+    <string name="text_favorites">Favorites</string>
+    <string name="text_schedules">Schedules</string>
+    <string name="text_music">Music</string>
 </resources>
